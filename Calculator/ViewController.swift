@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     @IBOutlet private weak var display: UILabel!
     
     private var userIsInTheMiddleOfTyping = false
-    
+
     // MARK: Actions
     @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
@@ -43,6 +43,7 @@ class ViewController: UIViewController {
             display.text = String(newValue)
         }
     }
+
     
     private var brain = CalculatorBrain()
     
@@ -62,10 +63,11 @@ class ViewController: UIViewController {
     
     
     
-    // Clear the display
+    // Clear the display and reset the accumulator
     @IBAction func clear(_ sender: UIButton) {
         userIsInTheMiddleOfTyping = false
-        display.text = "0"
+        brain.resetOperand()
+        displayValue = brain.result
     }
     
     

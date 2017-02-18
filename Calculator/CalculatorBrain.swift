@@ -8,19 +8,18 @@
 
 import Foundation
 
-func multiply(op1: Double, op2: Double) -> Double {
-    return op1 * op2;
-}
-
 class CalculatorBrain {
     
     
     private var accumulator = 0.0
+    private var description = "";
+    private var isPartialResult = false;
+    
     
     func setOperand(operand: Double) {
         accumulator = operand
     }
-    
+
     
     private var operations: Dictionary<String, Operation> = [
         "π" : Operation.Constant(M_PI),
@@ -45,15 +44,24 @@ class CalculatorBrain {
     func performOperation(symbol: String) {
         if let operation = operations[symbol] {
             switch operation {
-            case .Constant(let value): accumulator = value
-            case .UnaryOperation(let function): accumulator = function(accumulator)
-            case .BinaryOperation(let function): pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
+            case .Constant(let value):
+                accumulator = value
+            case .UnaryOperation(let function):
+                executePendingBinaryOperation()
+                accumulator = function(accumulator)
+            case .BinaryOperation(let function):
+                executePendingBinaryOperation()
+                pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
             case .Equals:
-                if pending != nil {
-                    accumulator = pending!.binaryFunction(pending!.firstOperand, accumulator)
-                    pending = nil
-                }
+                executePendingBinaryOperation()
             }
+        }
+    }
+    
+    private func executePendingBinaryOperation() {
+        if pending != nil {
+            accumulator = pending!.binaryFunction(pending!.firstOperand, accumulator)
+            pending = nil
         }
     }
     
@@ -63,6 +71,14 @@ class CalculatorBrain {
         var binaryFunction: (Double, Double) -> Double
         var firstOperand: Double
     }
+    
+    
+    // Reset
+    func resetOperand() {
+        accumulator = 0.0
+        pending = nil
+    }
+    
     
     var result: Double {
         get {
