@@ -9,15 +9,19 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
 
     // MARK: Properties
     @IBOutlet private weak var display: UILabel!
+    @IBOutlet private weak var status: UILabel!
     
     private var userIsInTheMiddleOfTyping = false
+    private var previousButton = "";
 
     // MARK: Actions
     @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
+        previousButton = digit;
         
         if userIsInTheMiddleOfTyping {
             
@@ -31,6 +35,7 @@ class ViewController: UIViewController {
         }
         else {
             display.text = digit
+            status.text = brain.showStatus()
         }
         userIsInTheMiddleOfTyping = true
     }
@@ -48,6 +53,15 @@ class ViewController: UIViewController {
     private var brain = CalculatorBrain()
     
     @IBAction private func performOperation(_ sender: UIButton) {
+
+        let binaryOperations = ["+", "-", "÷", "*", "%"];
+        
+        // Return if user touches any combination of binary operation buttons continously without entering a digit
+        if (binaryOperations.contains(previousButton) && binaryOperations.contains(sender.currentTitle!)) {
+            return;
+        }
+        
+        previousButton = sender.currentTitle!;
         
         if userIsInTheMiddleOfTyping {
             brain.setOperand(operand: displayValue)
@@ -58,6 +72,7 @@ class ViewController: UIViewController {
             brain.performOperation(symbol: mathematicalSymbol)
         }
         displayValue = brain.result
+        status.text = brain.showStatus()
         
     }
     

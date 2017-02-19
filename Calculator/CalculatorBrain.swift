@@ -47,7 +47,7 @@ class CalculatorBrain {
             case .Constant(let value):
                 accumulator = value
             case .UnaryOperation(let function):
-                executePendingBinaryOperation()
+                //executePendingBinaryOperation()
                 accumulator = function(accumulator)
             case .BinaryOperation(let function):
                 executePendingBinaryOperation()
@@ -62,6 +62,10 @@ class CalculatorBrain {
         if pending != nil {
             accumulator = pending!.binaryFunction(pending!.firstOperand, accumulator)
             pending = nil
+            isPartialResult = false
+        }
+        else {
+            isPartialResult = true
         }
     }
     
@@ -84,5 +88,9 @@ class CalculatorBrain {
         get {
             return accumulator
         }
+    }
+    
+    func showStatus() -> String {
+        return String(isPartialResult)
     }
 }

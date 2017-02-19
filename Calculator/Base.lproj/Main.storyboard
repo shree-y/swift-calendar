@@ -31,7 +31,7 @@
                                         <constraints>
                                             <constraint firstAttribute="height" constant="48" id="Bqe-Qm-Wvl"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                         <color key="textColor" red="1" green="0.5" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
@@ -357,6 +357,7 @@
                     </view>
                     <connections>
                         <outlet property="display" destination="YzI-Mi-gg6" id="UAe-bZ-Kxd"/>
+                        <outlet property="status" destination="U5k-49-2hh" id="Ji0-3q-yrh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
