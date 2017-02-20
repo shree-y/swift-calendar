@@ -35,9 +35,15 @@ class ViewController: UIViewController {
         }
         else {
             display.text = digit
-            status.text = brain.showStatus()
         }
         userIsInTheMiddleOfTyping = true
+        
+        if (brain.isPartialResult) {
+            brain.description += " " + digit
+        }
+        else {
+            brain.description += digit;
+        }
     }
     
     var displayValue: Double {
@@ -54,10 +60,10 @@ class ViewController: UIViewController {
     
     @IBAction private func performOperation(_ sender: UIButton) {
 
-        let binaryOperations = ["+", "-", "÷", "*", "%"];
+        let binarySymbols = ["+", "-", "÷", "*", "%"];
         
         // Return if user touches any combination of binary operation buttons continously without entering a digit
-        if (binaryOperations.contains(previousButton) && binaryOperations.contains(sender.currentTitle!)) {
+        if (binarySymbols.contains(previousButton) && binarySymbols.contains(sender.currentTitle!)) {
             return;
         }
         
@@ -70,10 +76,26 @@ class ViewController: UIViewController {
         
         if let mathematicalSymbol = sender.currentTitle {
             brain.performOperation(symbol: mathematicalSymbol)
+            updateStatusText(symbol: mathematicalSymbol);
         }
         displayValue = brain.result
-        status.text = brain.showStatus()
         
+    }
+    
+    private func updateStatusText(symbol: String) {
+        let unarySymbols = ["±", "√", "cos"]
+
+        if (brain.isPartialResult && brain.description != "") {
+            status.text = brain.description + " ..."
+        }
+        else {
+            status.text = brain.description + " ="
+            
+            // If there is no pending operation and if user just did a unary operation, set description to empty
+            if (unarySymbols.contains(symbol)) {
+                brain.description = "";
+            }
+        }
     }
     
     
@@ -81,8 +103,9 @@ class ViewController: UIViewController {
     // Clear the display and reset the accumulator
     @IBAction func clear(_ sender: UIButton) {
         userIsInTheMiddleOfTyping = false
-        brain.resetOperand()
+        brain.reset()
         displayValue = brain.result
+        status.text = brain.description
     }
     
     

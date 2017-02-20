@@ -12,8 +12,8 @@ class CalculatorBrain {
     
     
     private var accumulator = 0.0
-    private var description = "";
-    private var isPartialResult = false;
+    var description = "";
+    var isPartialResult = false;
     
     
     func setOperand(operand: Double) {
@@ -46,15 +46,19 @@ class CalculatorBrain {
             switch operation {
             case .Constant(let value):
                 accumulator = value
+                
             case .UnaryOperation(let function):
-                //executePendingBinaryOperation()
                 accumulator = function(accumulator)
+            
             case .BinaryOperation(let function):
                 executePendingBinaryOperation()
                 pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
+            
             case .Equals:
                 executePendingBinaryOperation()
             }
+            
+            updateDescription(symbol: symbol)
         }
     }
     
@@ -75,12 +79,68 @@ class CalculatorBrain {
         var binaryFunction: (Double, Double) -> Double
         var firstOperand: Double
     }
-    
+
+    private func updateDescription(symbol: String) {
+        let unarySymbols = ["±", "√", "cos"]
+        let binarySymbols = ["+", "-", "÷", "*", "%"];
+
+        if (isPartialResult) {
+            
+            // On a pending operation, if a user touches unary operation, 
+            // delete the last digit of description, append the symbol to the last digit
+            // and add it back to the description
+            if (description != "" && unarySymbols.contains(symbol)) {
+                var lastDigit = String(description[description.index(before: description.endIndex)])
+                lastDigit = symbol + "(" + lastDigit + ")"
+                description.remove(at: description.index(before: description.endIndex))
+                description += lastDigit
+                return;
+            }
+            // else add the symbol the the existing description
+            description += " " + symbol
+            
+        }
+        else {
+            if (symbol != "=") {
+                // Case where user performs a binary operation followed by unary operation
+                // 7 + 9 = √ would show “√(7 + 9) =” (4 in the display)
+                if (description != "" && unarySymbols.contains(symbol)) {
+                    description = symbol + "(" + description + ")"
+                }
+                // Case where user performs two binary operations back to back
+                
+                else {
+                    // For same symbols, there are no parenthesis
+                    // 7 + 9 = + 6 + 3 = would show “7 + 9 + 6 + 3 =” (25 in the display)
+                    if (description.contains(symbol)) {
+                        description = description + " " + symbol + " ";
+                    }
+                    else {
+                        description = "(" + description + ") " + symbol + " ";
+                    }
+                }
+            }
+            else {
+                // 7 + = 14 should be displayed as 7 + 7 = 14
+                // If the description's last character is a symbol, and user pressed '=' then append accumulator to the description
+                // Description last character
+                if (description != "") {
+                    let lastCharacter = String(description[description.index(before: description.endIndex)])
+                    if (binarySymbols.contains(lastCharacter)) {
+                        let firstDigit = String(description[description.startIndex])
+                        description = description + " " + firstDigit
+                    }
+                }
+            }
+        }
+
+    }
     
     // Reset
-    func resetOperand() {
+    func reset() {
         accumulator = 0.0
         pending = nil
+        description = ""
     }
     
     
@@ -88,9 +148,5 @@ class CalculatorBrain {
         get {
             return accumulator
         }
-    }
-    
-    func showStatus() -> String {
-        return String(isPartialResult)
     }
 }
